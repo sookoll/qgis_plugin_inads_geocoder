@@ -1,0 +1,108 @@
+<ui version="4.0">
+    <class>InADSGeoCoderDialogBase</class>
+    <widget class="QDialog" name="InADSGeoCoderDialogBase">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>400</width>
+                <height>105</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>InADS GeoCoder</string>
+        </property>
+
+        <widget class="QLabel" name="address_label">
+            <property name="geometry">
+                <rect>
+                    <x>20</x>
+                    <y>20</y>
+                    <width>360</width>
+                    <height>16</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Enter address:</string>
+            </property>
+        </widget>
+
+        <widget class="QLineEdit" name="address">
+            <property name="geometry">
+                <rect>
+                    <x>20</x>
+                    <y>40</y>
+                    <width>360</width>
+                    <height>20</height>
+                </rect>
+            </property>
+        </widget>
+
+        <widget class="QPushButton" name="geocode_button">
+            <property name="geometry">
+                <rect>
+                    <x>308</x>
+                    <y>65</y>
+                    <width>80</width>
+                    <height>32</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Search</string>
+            </property>
+        </widget>
+
+        <widget class="QDialogButtonBox" name="button_box">
+            <property name="geometry">
+                <rect>
+                    <x>30</x>
+                    <y>65</y>
+                    <width>280</width>
+                    <height>32</height>
+                </rect>
+            </property>
+            <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="standardButtons">
+                <set>QDialogButtonBox::Close</set>
+            </property>
+        </widget>
+
+    </widget>
+    <resources/>
+    <connections>
+        <connection>
+            <sender>button_box</sender>
+            <signal>accepted()</signal>
+            <receiver>InADSGeoCoderDialogBase</receiver>
+            <slot>accept()</slot>
+            <hints>
+                <hint type="source_label">
+                    <x>248</x>
+                    <y>254</y>
+                </hint>
+                <hint type="destination_label">
+                    <x>157</x>
+                    <y>274</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>button_box</sender>
+            <signal>rejected()</signal>
+            <receiver>InADSGeoCoderDialogBase</receiver>
+            <slot>reject()</slot>
+            <hints>
+                <hint type="source_label">
+                    <x>316</x>
+                    <y>260</y>
+                </hint>
+                <hint type="destination_label">
+                    <x>286</x>
+                    <y>274</y>
+                </hint>
+            </hints>
+        </connection>
+    </connections>
+</ui>
