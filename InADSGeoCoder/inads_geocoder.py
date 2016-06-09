@@ -78,8 +78,9 @@ class InADSGeoCoder:
             'liikVal',
             'ads_oid'
         ]
-        
-        
+
+        self.query_types = ['EHAK','TANAV','EHITISHOONE','KATASTRIYKSUS']
+
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
@@ -219,15 +220,22 @@ class InADSGeoCoder:
 
     def run(self):
         """Run method that performs all the real work"""
+
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         # show the dialog
         self.dlg.show()
-        
+        # set results input default value
+        self.dlg.results.setValue(10)
+        # query types
+        for t in self.query_types:
+            getattr(self.dlg, t).setChecked(1)
+
         # register search button clicked
         self.dlg.geocode_button.clicked.connect(self.geocode)
-        
+
         # Run the dialog event loop
         result = self.dlg.exec_()
-        
+
         # See if OK was pressed
         if result:
             pass
@@ -235,30 +243,38 @@ class InADSGeoCoder:
 
     def geocode(self):
         """ Send query to InADS service """
+        # collect params
         query = unicode(self.dlg.address.text()).encode('utf-8')
-        
+        results = self.dlg.results.text()
+        # query types
+        qtypes = []
+        for t in self.query_types:
+            if getattr(self.dlg, t).isChecked():
+                qtypes.append(t)
+        print(qtypes)
+
         # http://inaadress.maaamet.ee/inaadress/gazetteer?address=kesk&results=10&appartment=1&unik=0&features=EHAK%2CTANAV%2CEHITISHOONE%2CKATASTRIYKSUS
         url = 'http://inaadress.maaamet.ee/inaadress/gazetteer?'
-        
+
         params = {
             'address': query,
-            'results': 10,
+            'results': results,
             'appartment': 1,
             'unik': 0,
-            'features': 'EHAK,TANAV,EHITISHOONE,KATASTRIYKSUS'
+            'features': ','.join(qtypes)
         }
-        
+
         params = urllib.urlencode(params)
         url = "?".join((url, params))
-        
+
         response = urllib.urlopen(url)
         code = response.getcode()
-        
+
         if code != 200:
             pass
         else:
             data = json.load(response)
-            
+
             if 'addresses' in data:
                 places = data['addresses']
                 if len(places) > 0:
@@ -267,7 +283,7 @@ class InADSGeoCoder:
                         self.createLayer()
                     for place in places:
                         self.process_point(place)
-        
+
     def createLayer(self):
         # create layer with same CRS as map canvas
         self.layer = QgsVectorLayer("Point", "InADS addresses", "memory")
@@ -291,16 +307,16 @@ class InADSGeoCoder:
 
         # store layer id
         self.layerid = self.layer.id()
-        
+
     def process_point(self, place):
         # create point
         point = QgsPoint(float(place['viitepunkt_x']), float(place['viitepunkt_y']))
-        
+
         # add a feature
         fields=self.layer.pendingFields()
         f = QgsFeature(fields)
         f.setGeometry(QgsGeometry.fromPoint(point))
-        
+
         # add fields
         for attr in self.layer_attributes:
             f[attr] = place[attr]
