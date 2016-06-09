@@ -31,6 +31,7 @@ import os.path
 import urllib
 import json
 from qgis.core import *
+from utils import *
 
 
 class InADSGeoCoder:
@@ -80,6 +81,11 @@ class InADSGeoCoder:
         ]
 
         self.query_types = ['EHAK','TANAV','EHITISHOONE','KATASTRIYKSUS']
+        
+        # http://inaadress.maaamet.ee/inaadress/gazetteer?address=kesk&results=10&appartment=1&unik=0&features=EHAK%2CTANAV%2CEHITISHOONE%2CKATASTRIYKSUS
+        self.url = 'http://inaadress.maaamet.ee/inaadress/gazetteer'
+        
+        self.reverse_active = False
 
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
@@ -209,6 +215,8 @@ class InADSGeoCoder:
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
+        self.iface.actionPan().trigger()
+        self.dlg.address.clear()
         for action in self.actions:
             self.iface.removePluginMenu(
                 self.tr(u'&InADS GeoCoder'),
@@ -224,6 +232,7 @@ class InADSGeoCoder:
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         # show the dialog
         self.dlg.show()
+        self.dlg.address.clear()
         # set results input default value
         self.dlg.results.setValue(10)
         # query types
@@ -231,7 +240,14 @@ class InADSGeoCoder:
             getattr(self.dlg, t).setChecked(1)
 
         # register search button clicked
+        self.dlg.geocode_button.setStyleSheet("qproperty-icon: url(:/plugins/InADSGeoCoder/search.png);")
+        self.dlg.geocode_button.setToolTip("Search")
         self.dlg.geocode_button.clicked.connect(self.geocode)
+        
+        # reverse
+        self.dlg.reverse_button.setStyleSheet("qproperty-icon: url(:/plugins/InADSGeoCoder/locate.png);")
+        self.dlg.reverse_button.setToolTip("Reverse geocode")
+        self.dlg.reverse_button.clicked.connect(self.reverseActivate)
 
         # Run the dialog event loop
         result = self.dlg.exec_()
@@ -242,7 +258,6 @@ class InADSGeoCoder:
 
 
     def geocode(self):
-        """ Send query to InADS service """
         # collect params
         query = unicode(self.dlg.address.text()).encode('utf-8')
         results = self.dlg.results.text()
@@ -251,10 +266,6 @@ class InADSGeoCoder:
         for t in self.query_types:
             if getattr(self.dlg, t).isChecked():
                 qtypes.append(t)
-        print(qtypes)
-
-        # http://inaadress.maaamet.ee/inaadress/gazetteer?address=kesk&results=10&appartment=1&unik=0&features=EHAK%2CTANAV%2CEHITISHOONE%2CKATASTRIYKSUS
-        url = 'http://inaadress.maaamet.ee/inaadress/gazetteer?'
 
         params = {
             'address': query,
@@ -263,9 +274,49 @@ class InADSGeoCoder:
             'unik': 0,
             'features': ','.join(qtypes)
         }
+        
+        self.request(params)
 
+
+    def reverseActivate(self):
+        if self.reverse_active:
+            self.iface.actionPan().trigger()
+            self.reverse_active = False
+        else:
+            self.dlg.address.clear()
+            sb = self.iface.mainWindow().statusBar()
+            sb.showMessage("Click on the map to obtain the address")
+            ct = ClickTool(self.iface,  self.reverseGeocode);
+            self.iface.mapCanvas().setMapTool(ct)
+            self.reverse_active = True
+        
+        
+    def reverseGeocode(self, point):
+        # TODO: reproject from map to 3301
+        point = pointTo3301(point, self.iface.mapCanvas().mapRenderer().destinationCrs())
+        results = self.dlg.results.text()
+        # query types
+        qtypes = []
+        for t in self.query_types:
+            if getattr(self.dlg, t).isChecked():
+                qtypes.append(t)
+
+        params = {
+            'x': point[0],
+            'y': point[1],
+            'results': results,
+            'appartment': 1,
+            'features': ','.join(qtypes)
+        }
+        
+        self.request(params)
+    
+    
+    def request(self, params):
+        """ Send query to InADS service """
+        
         params = urllib.urlencode(params)
-        url = "?".join((url, params))
+        url = "?".join([self.url, params])
 
         response = urllib.urlopen(url)
         code = response.getcode()
@@ -283,6 +334,7 @@ class InADSGeoCoder:
                         self.createLayer()
                     for place in places:
                         self.process_point(place)
+
 
     def createLayer(self):
         # create layer with same CRS as map canvas

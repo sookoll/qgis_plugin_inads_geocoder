@@ -54,6 +54,12 @@
               </spacer>
             </item>
             <item>
+              <!-- reverse geocode button -->
+              <widget class="QPushButton" name="reverse_button">
+                
+              </widget>
+            </item>
+            <item>
               <!-- geocode button -->
               <widget class="QPushButton" name="geocode_button">
                 <property name="text">

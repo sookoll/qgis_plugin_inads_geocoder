@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/plugins/InADSGeoCoder" >
         <file>icon.png</file>
+        <file>search.png</file>
+        <file>locate.png</file>
     </qresource>
 </RCC>
