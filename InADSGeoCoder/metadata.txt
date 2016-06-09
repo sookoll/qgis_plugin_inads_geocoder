@@ -10,7 +10,7 @@
 name=InADS GeoCoder
 qgisMinimumVersion=2.0
 description=Geocoder plugin for Estonian InADS geocoding service
-version=0.2
+version=0.1
 author=sookoll
 email=mihkel.oviir@gmail.com
 
