@@ -286,9 +286,10 @@ class InADSGeoCoder:
 
     def createLayer(self):
         # create layer with same CRS as map canvas
-        self.layer = QgsVectorLayer("Point", "InADS addresses", "memory")
+        self.layer = QgsVectorLayer("Point?crs=EPSG:3301", "InADS addresses", "memory")
+        #self.layer.setCrs(self.canvas.mapRenderer().destinationCrs())
         self.provider = self.layer.dataProvider()
-        self.layer.setCrs(self.canvas.mapRenderer().destinationCrs())
+
 
         # add fields
         for attr in self.layer_attributes:
