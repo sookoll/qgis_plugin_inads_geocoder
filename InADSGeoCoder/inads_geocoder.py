@@ -81,10 +81,10 @@ class InADSGeoCoder:
         ]
 
         self.query_types = ['EHAK','TANAV','EHITISHOONE','KATASTRIYKSUS']
-        
+
         # http://inaadress.maaamet.ee/inaadress/gazetteer?address=kesk&results=10&appartment=1&unik=0&features=EHAK%2CTANAV%2CEHITISHOONE%2CKATASTRIYKSUS
         self.url = 'http://inaadress.maaamet.ee/inaadress/gazetteer'
-        
+
         self.reverse_active = False
 
         # initialize plugin directory
@@ -105,23 +105,28 @@ class InADSGeoCoder:
 
         # Create the dialog (after translation) and keep reference
         self.dlg = InADSGeoCoderDialog()
+        # stay on top
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.closeEvent = self.closeUi
-        self.dlg.keyPressEvent = self.preventEsc
-        
+        # disable click tool on dialog close
+        self.dlg.hideEvent = self.closeUi
+        # reject button
         buttonBox = self.dlg.findChild(QDialogButtonBox,"button_box")
-        buttonBox.rejected.connect(self.reject)
-        
+        buttonBox.rejected.connect(self.dlg.reject)
+
         # register search button clicked
         self.dlg.geocode_button.setStyleSheet("qproperty-icon: url(:/plugins/InADSGeoCoder/search.png);")
         self.dlg.geocode_button.setToolTip("Search")
+        self.dlg.geocode_button.setDefault(True);
+        self.dlg.geocode_button.setAutoDefault(True);
         self.dlg.geocode_button.clicked.connect(self.geocode)
-        
+
         # reverse
         self.dlg.reverse_button.setStyleSheet("qproperty-icon: url(:/plugins/InADSGeoCoder/locate.png);")
         self.dlg.reverse_button.setToolTip("Reverse geocode")
+        self.dlg.reverse_button.setDefault(False);
+        self.dlg.reverse_button.setAutoDefault(False);
         self.dlg.reverse_button.clicked.connect(self.reverseActivate)
-        
+
 
         # Declare instance attributes
         self.actions = []
@@ -129,6 +134,7 @@ class InADSGeoCoder:
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'InADSGeoCoder')
         self.toolbar.setObjectName(u'InADSGeoCoder')
+
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -219,6 +225,7 @@ class InADSGeoCoder:
 
         return action
 
+
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
@@ -234,20 +241,17 @@ class InADSGeoCoder:
         self.iface.actionPan().trigger()
         self.reverse_active = False
         self.dlg.address.clear()
-        
-        
-    def reject(self):
-        self.closeUi(None)
-        self.dlg.reject()
-        
-    
+
+
     def preventEsc(self, e):
-        if e.key() != Qt.Key_Escape:
-            QDialog.keyPressEvent(QDialog, e)
-        else:
+        if e.key() == Qt.Key_Escape:
             pass
-    
-    
+        elif e.key() == Qt.Key_Enter:
+            self.geocode()
+        else:
+            QDialog.keyPressEvent(e)
+
+
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         self.iface.actionPan().trigger()
@@ -300,12 +304,11 @@ class InADSGeoCoder:
             'unik': 0,
             'features': ','.join(qtypes)
         }
-        
+
         self.request(params)
 
 
     def reverseActivate(self):
-        print(self.reverse_active)
         if self.reverse_active:
             self.iface.actionPan().trigger()
             self.reverse_active = False
@@ -316,11 +319,11 @@ class InADSGeoCoder:
             ct = ClickTool(self.iface,  self.reverseGeocode);
             self.iface.mapCanvas().setMapTool(ct)
             self.reverse_active = True
-        
-        
+
+
     def reverseGeocode(self, point):
-        # TODO: reproject from map to 3301
-        point = pointTo3301(point, self.iface.mapCanvas().mapRenderer().destinationCrs())
+        # reproject to 3301
+        point = pointTo3301(point, self.iface.mapCanvas().mapSettings().destinationCrs())
         results = self.dlg.results.text()
         # query types
         qtypes = []
@@ -335,13 +338,13 @@ class InADSGeoCoder:
             'appartment': 1,
             'features': ','.join(qtypes)
         }
-        
+
         self.request(params)
-    
-    
+
+
     def request(self, params):
         """ Send query to InADS service """
-        
+
         params = urllib.urlencode(params)
         url = "?".join([self.url, params])
 
@@ -352,35 +355,44 @@ class InADSGeoCoder:
             pass
         else:
             data = json.load(response)
-
             if 'addresses' in data:
                 places = data['addresses']
                 if len(places) > 0:
+                    # clear input
                     self.dlg.address.clear()
+                    # create layer
                     if not QgsMapLayerRegistry.instance().mapLayer(self.layerid):
                         self.createLayer()
+                    # start edit
+                    self.layer.startEditing()
+                    # add features to layer
                     for place in places:
                         self.process_point(place)
+                    # commit
+                    self.layer.commitChanges()
 
 
     def createLayer(self):
         # create layer with same CRS as map canvas
         self.layer = QgsVectorLayer("Point?crs=EPSG:3301", "InADS addresses", "memory")
-        #self.layer.setCrs(self.canvas.mapRenderer().destinationCrs())
         self.provider = self.layer.dataProvider()
-
 
         # add fields
         for attr in self.layer_attributes:
             self.provider.addAttributes([QgsField(attr, QVariant.String)])
 
+
         # BUG: need to explicitly call it, should be automatic!
         self.layer.updateFields()
 
         # Labels on
-        label = self.layer.label()
-        label.setLabelField(QgsLabel.Text, 0)
-        self.layer.enableLabels(True)
+        self.layer.setCustomProperty("labeling", "pal")
+        self.layer.setCustomProperty("labeling/enabled", "true")
+        self.layer.setCustomProperty("labeling/fontFamily", "Arial")
+        self.layer.setCustomProperty("labeling/fontSize", "10")
+        self.layer.setCustomProperty("labeling/fieldName", "aadresstekst")
+        self.layer.setCustomProperty("labeling/placement", "2")
+        self.canvas.refresh()
 
         # add layer if not already
         QgsMapLayerRegistry.instance().addMapLayer(self.layer)
