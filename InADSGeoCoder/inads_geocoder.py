@@ -105,6 +105,23 @@ class InADSGeoCoder:
 
         # Create the dialog (after translation) and keep reference
         self.dlg = InADSGeoCoderDialog()
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg.closeEvent = self.closeUi
+        self.dlg.keyPressEvent = self.preventEsc
+        
+        buttonBox = self.dlg.findChild(QDialogButtonBox,"button_box")
+        buttonBox.rejected.connect(self.reject)
+        
+        # register search button clicked
+        self.dlg.geocode_button.setStyleSheet("qproperty-icon: url(:/plugins/InADSGeoCoder/search.png);")
+        self.dlg.geocode_button.setToolTip("Search")
+        self.dlg.geocode_button.clicked.connect(self.geocode)
+        
+        # reverse
+        self.dlg.reverse_button.setStyleSheet("qproperty-icon: url(:/plugins/InADSGeoCoder/locate.png);")
+        self.dlg.reverse_button.setToolTip("Reverse geocode")
+        self.dlg.reverse_button.clicked.connect(self.reverseActivate)
+        
 
         # Declare instance attributes
         self.actions = []
@@ -213,9 +230,28 @@ class InADSGeoCoder:
             parent=self.iface.mainWindow())
 
 
+    def closeUi(self, e):
+        self.iface.actionPan().trigger()
+        self.reverse_active = False
+        self.dlg.address.clear()
+        
+        
+    def reject(self):
+        self.closeUi(None)
+        self.dlg.reject()
+        
+    
+    def preventEsc(self, e):
+        if e.key() != Qt.Key_Escape:
+            QDialog.keyPressEvent(QDialog, e)
+        else:
+            pass
+    
+    
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         self.iface.actionPan().trigger()
+        self.reverse_active = False
         self.dlg.address.clear()
         for action in self.actions:
             self.iface.removePluginMenu(
@@ -229,7 +265,7 @@ class InADSGeoCoder:
     def run(self):
         """Run method that performs all the real work"""
 
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.reverse_active = False
         # show the dialog
         self.dlg.show()
         self.dlg.address.clear()
@@ -238,16 +274,6 @@ class InADSGeoCoder:
         # query types
         for t in self.query_types:
             getattr(self.dlg, t).setChecked(1)
-
-        # register search button clicked
-        self.dlg.geocode_button.setStyleSheet("qproperty-icon: url(:/plugins/InADSGeoCoder/search.png);")
-        self.dlg.geocode_button.setToolTip("Search")
-        self.dlg.geocode_button.clicked.connect(self.geocode)
-        
-        # reverse
-        self.dlg.reverse_button.setStyleSheet("qproperty-icon: url(:/plugins/InADSGeoCoder/locate.png);")
-        self.dlg.reverse_button.setToolTip("Reverse geocode")
-        self.dlg.reverse_button.clicked.connect(self.reverseActivate)
 
         # Run the dialog event loop
         result = self.dlg.exec_()
@@ -279,6 +305,7 @@ class InADSGeoCoder:
 
 
     def reverseActivate(self):
+        print(self.reverse_active)
         if self.reverse_active:
             self.iface.actionPan().trigger()
             self.reverse_active = False
