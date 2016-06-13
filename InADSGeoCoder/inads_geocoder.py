@@ -80,7 +80,7 @@ class InADSGeoCoder:
             'ads_oid'
         ]
 
-        self.query_types = ['EHAK','TANAV','EHITISHOONE','KATASTRIYKSUS']
+        self.query_types = ['EHAK','VAIKEKOHT','TANAV','EHITISHOONE','KATASTRIYKSUS']
 
         # http://inaadress.maaamet.ee/inaadress/gazetteer?address=kesk&results=10&appartment=1&unik=0&features=EHAK%2CTANAV%2CEHITISHOONE%2CKATASTRIYKSUS
         self.url = 'http://inaadress.maaamet.ee/inaadress/gazetteer'
