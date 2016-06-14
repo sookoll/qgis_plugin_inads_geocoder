@@ -1,300 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-  <class>InADSGeoCoderDialogBase</class>
-  <widget class="QDialog" name="InADSGeoCoderDialogBase">
-
-    <!-- main window -->
-    <property name="geometry">
-      <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>340</width>
-        <height>240</height>
-      </rect>
-    </property>
-    <property name="windowTitle">
-      <string>InADS GeoCoder</string>
-    </property>
-
-    <widget class="QWidget" name="verticalLayoutWidget">
-      <property name="geometry">
-        <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>320</width>
-          <height>220</height>
-        </rect>
+ <class>InADSGeoCoderDialogBase</class>
+ <widget class="QDialog" name="InADSGeoCoderDialogBase">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>374</width>
+    <height>264</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>InADS GeoCoder</string>
+  </property>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>355</width>
+     <height>251</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout">
+    <item>
+     <widget class="QLineEdit" name="address">
+      <property name="inputMask">
+       <string/>
       </property>
-
-      <layout class="QVBoxLayout">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string>Enter search string</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout">
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Type</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="act_type">
         <item>
-          <!-- address label -->
-          <widget class="QLabel" name="address_label">
+         <property name="text">
+          <string>address</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>adsoid</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>adrid</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <spacer>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>140</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="reverse_button"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="geocode_button">
+        <property name="text">
+         <string>Search</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QLabel" name="opts_label">
+      <property name="text">
+       <string>Options:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout">
+      <item>
+       <layout class="QVBoxLayout">
+        <item>
+         <widget class="QCheckBox" name="EHAK">
+          <property name="text">
+           <string>EHAK</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="VAIKEKOHT">
+          <property name="text">
+           <string>Place</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="TANAV">
+          <property name="text">
+           <string>Street</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="EHITISHOONE">
+          <property name="text">
+           <string>Building</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="KATASTRIYKSUS">
+          <property name="text">
+           <string>Cadaster</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout">
+        <item>
+         <layout class="QHBoxLayout">
+          <item>
+           <widget class="QCheckBox" name="unique"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label">
             <property name="text">
-              <string>Enter address:</string>
+             <string>Unique</string>
             </property>
-          </widget>
-        </item>
-        <item>
-          <!-- address input -->
-          <widget class="QLineEdit" name="address" />
-        </item>
-        <item>
-          <layout class="QHBoxLayout">
-            <item>
-              <spacer>
-                <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                  <size>
-                    <width>140</width>
-                    <height>20</height>
-                  </size>
-                </property>
-              </spacer>
-            </item>
-            <item>
-              <!-- reverse geocode button -->
-              <widget class="QPushButton" name="reverse_button">
-
-              </widget>
-            </item>
-            <item>
-              <!-- geocode button -->
-              <widget class="QPushButton" name="geocode_button">
-                <property name="text">
-                  <string>Search</string>
-                </property>
-              </widget>
-            </item>
-          </layout>
-
-        </item>
-        <item>
-          <!-- options text -->
-          <widget class="QLabel" name="opts_label">
-            <property name="text">
-              <string>Options:</string>
-            </property>
-          </widget>
-        </item>
-        <item>
-          <layout class="QHBoxLayout">
-            <item>
-              <layout class="QVBoxLayout">
-                <item>
-                  <layout class="QHBoxLayout">
-                    <item>
-                      <widget class="QCheckBox" name="EHAK"/>
-                    </item>
-                    <item>
-                      <widget class="QLabel">
-                        <property name="text">
-                          <string>EHAK</string>
-                        </property>
-                      </widget>
-                    </item>
-                    <item>
-                      <spacer>
-                        <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                          <size>
-                            <width>20</width>
-                            <height>20</height>
-                          </size>
-                        </property>
-                      </spacer>
-                    </item>
-                  </layout>
-                </item>
-                <item>
-                  <layout class="QHBoxLayout">
-                    <item>
-                      <widget class="QCheckBox" name="VAIKEKOHT"/>
-                    </item>
-                    <item>
-                      <widget class="QLabel">
-                        <property name="text">
-                          <string>Place</string>
-                        </property>
-                      </widget>
-                    </item>
-                    <item>
-                      <spacer>
-                        <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                          <size>
-                            <width>20</width>
-                            <height>20</height>
-                          </size>
-                        </property>
-                      </spacer>
-                    </item>
-                  </layout>
-                </item>
-                <item>
-                  <layout class="QHBoxLayout">
-                    <item>
-                      <widget class="QCheckBox" name="TANAV"/>
-                    </item>
-                    <item>
-                      <widget class="QLabel">
-                        <property name="text">
-                          <string>Street</string>
-                        </property>
-                      </widget>
-                    </item>
-                    <item>
-                      <spacer>
-                        <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                          <size>
-                            <width>20</width>
-                            <height>20</height>
-                          </size>
-                        </property>
-                      </spacer>
-                    </item>
-                  </layout>
-                </item>
-                <item>
-                  <layout class="QHBoxLayout">
-                    <item>
-                      <widget class="QCheckBox" name="EHITISHOONE"/>
-                    </item>
-                    <item>
-                      <widget class="QLabel">
-                        <property name="text">
-                          <string>Building</string>
-                        </property>
-                      </widget>
-                    </item>
-                    <item>
-                      <spacer>
-                        <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                          <size>
-                            <width>20</width>
-                            <height>20</height>
-                          </size>
-                        </property>
-                      </spacer>
-                    </item>
-                  </layout>
-                </item>
-                <item>
-                  <layout class="QHBoxLayout">
-                    <item>
-                      <widget class="QCheckBox" name="KATASTRIYKSUS"/>
-                    </item>
-                    <item>
-                      <widget class="QLabel">
-                        <property name="text">
-                          <string>Cadaster</string>
-                        </property>
-                      </widget>
-                    </item>
-                    <item>
-                      <spacer>
-                        <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                          <size>
-                            <width>20</width>
-                            <height>20</height>
-                          </size>
-                        </property>
-                      </spacer>
-                    </item>
-                  </layout>
-                </item>
-              </layout>
-            </item>
-            <item>
-              <layout class="QVBoxLayout">
-                <item>
-                  <layout class="QHBoxLayout">
-                    <item>
-                      <!-- results input -->
-                      <widget class="QSpinBox" name="results">
-                        <property name="minimum">
-                          <number>1</number>
-                        </property>
-                        <property name="maximum">
-                          <number>100</number>
-                        </property>
-                        <property name="singleStep">
-                          <number>1</number>
-                        </property>
-                      </widget>
-                    </item>
-                    <item>
-                      <!-- results label -->
-                      <widget class="QLabel" name="results_label">
-                        <property name="text">
-                          <string>Max results</string>
-                        </property>
-                      </widget>
-                    </item>
-
-                  </layout>
-                </item>
-                <item>
-                  <spacer>
-                    <property name="orientation">
-                      <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                      <size>
-                        <width>120</width>
-                        <height>120</height>
-                      </size>
-                    </property>
-                  </spacer>
-                </item>
-              </layout>
-            </item>
-            <item>
-              <spacer>
-                <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                  <size>
-                    <width>40</width>
-                    <height>120</height>
-                  </size>
-                </property>
-              </spacer>
-            </item>
-          </layout>
-        </item>
-        <item>
-          <!-- dialog buttons -->
-          <widget class="QDialogButtonBox" name="button_box">
+           </widget>
+          </item>
+          <item>
+           <spacer>
             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
-            <property name="standardButtons">
-              <set>QDialogButtonBox::Close</set>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
             </property>
-          </widget>
+           </spacer>
+          </item>
+         </layout>
         </item>
-      </layout>
-
-    </widget>
-
+        <item>
+         <layout class="QHBoxLayout">
+          <item>
+           <widget class="QSpinBox" name="results">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="singleStep">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="results_label">
+            <property name="text">
+             <string>Max results</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QDialogButtonBox" name="button_box">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="standardButtons">
+       <set>QDialogButtonBox::Close</set>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
-
-  <resources/>
-
+ </widget>
+ <resources/>
+ <connections/>
 </ui>

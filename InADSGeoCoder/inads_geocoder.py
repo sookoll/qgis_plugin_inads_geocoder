@@ -243,15 +243,6 @@ class InADSGeoCoder:
         self.dlg.address.clear()
 
 
-    def preventEsc(self, e):
-        if e.key() == Qt.Key_Escape:
-            pass
-        elif e.key() == Qt.Key_Enter:
-            self.geocode()
-        else:
-            QDialog.keyPressEvent(e)
-
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         self.iface.actionPan().trigger()
@@ -277,7 +268,10 @@ class InADSGeoCoder:
         self.dlg.results.setValue(10)
         # query types
         for t in self.query_types:
-            getattr(self.dlg, t).setChecked(1)
+            getattr(self.dlg, t).setChecked(0)
+            
+        # unique
+        self.dlg.unique.setChecked(1)
 
         # Run the dialog event loop
         result = self.dlg.exec_()
@@ -289,6 +283,7 @@ class InADSGeoCoder:
 
     def geocode(self):
         # collect params
+        act = self.dlg.act_type.currentText()
         query = unicode(self.dlg.address.text()).encode('utf-8')
         results = self.dlg.results.text()
         # query types
@@ -296,14 +291,27 @@ class InADSGeoCoder:
         for t in self.query_types:
             if getattr(self.dlg, t).isChecked():
                 qtypes.append(t)
-
-        params = {
-            'address': query,
-            'results': results,
-            'appartment': 1,
-            'unik': 0,
-            'features': ','.join(qtypes)
-        }
+        unik = 0
+        if self.dlg.unique.isChecked():
+            unik = 1
+        
+        # address
+        if act == 'address':
+            params = {
+                'address': query,
+                'results': results,
+                'appartment': 0,
+                'unik': unik,
+                'features': ','.join(qtypes)
+            }
+        elif act == 'adsoid':
+            params = {
+                'adsoid': query
+            }
+        elif act == 'adrid':
+            params = {
+                'adrid': query
+            }
 
         self.request(params)
 
@@ -411,7 +419,8 @@ class InADSGeoCoder:
 
         # add fields
         for attr in self.layer_attributes:
-            f[attr] = place[attr]
+            if attr in place:
+                f[attr] = place[attr]
 
         self.provider.addFeatures([ f ])
         self.canvas.refresh()
