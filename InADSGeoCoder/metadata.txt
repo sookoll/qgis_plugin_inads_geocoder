@@ -10,7 +10,7 @@
 name=InADS GeoCoder
 qgisMinimumVersion=2.0
 description=Geocoder plugin for Estonian InADS geocoding service
-version=0.1
+version=0.2
 author=sookoll
 email=mihkel.oviir@gmail.com
 
@@ -32,7 +32,7 @@ homepage=https://github.com/sookoll/qgis_plugin_inads_geocoder
 category=Plugins
 icon=icon.png
 # experimental flag
-experimental=True
+experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
